@@ -2,7 +2,7 @@
 from datetime import datetime
 import uuid
 
-from elvis import ElvisClient
+from elvis.api import ElvisClient
 from elvis.enums import (WarehouseType, WarehouseListItemSearchField, WarehouseListItemSortField, SortDirection, VehicleType, WaybillStatus,
                          WaybillRoleContext, WaybillListItemSearchField, WaybillListItemSortField, AssortmentType)
 from elvis.models import (TimberAssortment, Certificate, TimberBatch, TimberWarehouse, Address, FilterItem, SortItem, Pack, Shipment,
