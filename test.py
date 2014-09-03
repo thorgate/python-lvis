@@ -23,26 +23,26 @@ class ElvisProxyTest(object):
         self.waybill = None
 
     def test_authorize(self):
-        print "Ühenduse loomine ..."
+        print("Ühenduse loomine ...")
         assert self.client.authorize()
-        print "Ühenduse loomine õnnestus"
+        print("Ühenduse loomine õnnestus")
 
     def test_assortment_types(self):
-        print "Sortimendi tüüpide pärimine (elvise omad) ..."
+        print("Sortimendi tüüpide pärimine (elvise omad) ...")
 
         a_types = self.client.get_assortment_types(AssortmentType.ELVIS)
 
-        print "Sortimendi tüüpide pärimine õnnestust (%d vastet)!" % len(a_types)
+        print("Sortimendi tüüpide pärimine õnnestust (%d vastet)!" % len(a_types))
 
     def test_assortment_types_company(self):
-        print "Sortimendi tüüpide pärimine (firma omad) ..."
+        print("Sortimendi tüüpide pärimine (firma omad) ...")
 
         a_types = self.client.get_assortment_types(AssortmentType.COMPANY)
 
-        print "Sortimendi tüüpide pärimine õnnestust (%d vastet)!" % len(a_types)
+        print("Sortimendi tüüpide pärimine õnnestust (%d vastet)!" % len(a_types))
 
     def test_add_warehouse(self):
-        print "Lao lisamine"
+        print("Lao lisamine")
 
         the_id = str(uuid.uuid4()).replace('-', '').lower()
 
@@ -101,33 +101,33 @@ class ElvisProxyTest(object):
         )
         self.warehouse_id = self.client.insert_warehouse(warehouse)
 
-        print "Lao sisestamine õnnestus! ID: %s" % self.warehouse_id
+        print("Lao sisestamine õnnestus! ID: %s" % self.warehouse_id)
 
     def test_get_warehouse(self):
-        print "Lao lugemine (number = %d) ..." % self.warehouse_id
+        print("Lao lugemine (number = %d) ..." % self.warehouse_id)
 
         ware = self.client.get_warehouse(self.warehouse_id)
 
-        print "Lao lugemine õnnestus %d!" % ware.Id
+        print("Lao lugemine õnnestus %d!" % ware.Id)
 
     def test_search_warehouse(self):
-        print "Ladude otsimine."
+        print("Ladude otsimine.")
 
         warehouse_search_res = self.client.search_warehouses(FilterItem(WarehouseListItemSearchField.IsPublic, True),
                                                              SortItem(WarehouseListItemSortField.Name,
                                                                       SortDirection.Asc),
                                                              0, 10, True)
 
-        print "Ladude ostimine õnnestus! Leiti %d vastet." % warehouse_search_res.get('TotalCount', 0)
+        print("Ladude ostimine õnnestus! Leiti %d vastet." % warehouse_search_res.get('TotalCount', 0))
 
     def test_delete_warehouse(self):
-        print "Lao %d kustutamine." % self.warehouse_id
+        print("Lao %d kustutamine." % self.warehouse_id)
 
         if self.client.delete_warehouse(self.warehouse_id) is True:
-            print "Lao kustutamine õnnestus!"
+            print("Lao kustutamine õnnestus!")
 
     def test_insert_waybill(self):
-        print "Veoselehe sisestamine..."
+        print("Veoselehe sisestamine...")
 
         timber_batch = TimberBatch(
             appropriation="TestAppropriation",
@@ -329,30 +329,30 @@ class ElvisProxyTest(object):
 
         self.waybill_id = self.client.insert_waybill(waybill)
 
-        print u"Veoselehe sisestamine õnnestus %s!" % self.waybill_id
+        print("Veoselehe sisestamine õnnestus %s!" % self.waybill_id)
 
     def test_get_waybill(self):
-        print "Veoselehe lugemine (number = %s) ..." % self.waybill_id
+        print("Veoselehe lugemine (number = %s) ..." % self.waybill_id)
 
         self.waybill = self.client.get_waybill(self.waybill_id)
-        print u"Veoselehe lugemine õnnestus %s!" % self.waybill.Number
+        print("Veoselehe lugemine õnnestus %s!" % self.waybill.Number)
 
     def test_set_waybill_status(self):
-        print u"Veoselehe (number = %s) staatuse muutmine %d -> %d ..." % (self.waybill.Number,
-                                                                          self.waybill.Status,
-                                                                          WaybillStatus.Unloaded)
+        print("Veoselehe (number = %s) staatuse muutmine %d -> %d ..." % (self.waybill.Number,
+                                                                           self.waybill.Status,
+                                                                           WaybillStatus.Unloaded))
 
         if self.client.set_waybill_status(self.waybill.Number, WaybillStatus.Unloaded, "Maha laetud.",
                                           None, 200, None, self.waybill.Version):
-            print "Veosele staatuse muutmine õnnestus!"
+            print("Veosele staatuse muutmine õnnestus!")
 
     def test_get_waybill_status(self):
-        print u"Veoselehe (number = %s) staatuse pärimine..." % self.waybill.Number
+        print("Veoselehe (number = %s) staatuse pärimine..." % self.waybill.Number)
         status = self.client.get_waybill_status(self.waybill.Number)
-        print u"Veoselehe staatuse päring õnnestus, staatus on %s." % status.Status
+        print("Veoselehe staatuse päring õnnestus, staatus on %s." % status.Status)
 
     def test_search_waybills(self):
-        print "Veoselehtede otsimine ..."
+        print("Veoselehtede otsimine ...")
 
         search_result = self.client.search_waybills(
             WaybillRoleContext.All,
@@ -367,7 +367,8 @@ class ElvisProxyTest(object):
             0, 10, True
         )
 
-        print "Veoselehtede otsimine õnnestus! (%d tulemust)" % search_result.TotalCount
+        print("Veoselehtede otsimine õnnestus! (%d tulemust)" % search_result.TotalCount)
+
 
 if __name__ == '__main__':
 
@@ -391,4 +392,4 @@ if __name__ == '__main__':
 
     test.test_search_waybills()
 
-    print "Testi lõpp!"
+    print("Testi lõpp!")

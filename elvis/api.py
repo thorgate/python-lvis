@@ -1,8 +1,11 @@
 #coding:utf-8
-from datetime import datetime
-from decimal import Decimal
+import base64
 import json
 import requests
+from datetime import datetime
+from decimal import Decimal
+
+from django.utils.encoding import force_text
 
 from .enums import (WarehouseType, AssortmentType, TransportOrderRoleContext, WaybillRoleContext)
 from .models import (FilterItem, SortItem, Address, ElvisModel, TransportOrderListPage, TransportOrder, TransportOrderStatusInfo,
@@ -62,7 +65,7 @@ class ElvisClient(object):
     def load_cert_from_fieldfile(self, fieldfile):
         try:
             fieldfile.open(mode='rb')
-            self.certificate = fieldfile.read().encode("base64")
+            self.certificate = force_text(base64.b64encode(fieldfile.read()), 'utf-8')
             fieldfile.close()
         except IOError:
             raise Exception("FieldFile %s is invalid" % fieldfile)
@@ -70,19 +73,14 @@ class ElvisClient(object):
     def load_cert_from_file(self, file_path):
         try:
             with open(file_path, "rb") as fHandle:
-                cert_bytes = fHandle.read().encode("base64")
+                self.certificate = force_text(base64.b64encode(fHandle.read()), 'utf-8')
                 fHandle.close()
-                self.certificate = cert_bytes
         except IOError:
             raise Exception("File %s is invalid" % file_path)
 
     def load_cert_from_str(self, certificate_data):
         # Note: may need validation here?
-
-        try:
-            self.certificate = certificate_data.encode("base64")
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            raise Exception("String is invalid")
+        self.certificate = force_text(base64.b64encode(certificate_data), 'utf-8')
 
     def load_cert_from_base64str(self, certificate_data):
         # Note: may need validation here?
@@ -177,14 +175,14 @@ class ElvisClient(object):
         if isinstance(filters, FilterItem):
             filters = (filters, )
 
-        assert not filter(lambda x: not isinstance(x, FilterItem), filters), \
+        assert not list(filter(lambda x: not isinstance(x, FilterItem), filters)), \
             'All filters must be instances of FilterItem'
 
         assert isinstance(sorting, (list, tuple, SortItem)), 'Sorting must be a list or tuple'
         if isinstance(sorting, SortItem):
             sorting = (sorting, )
 
-        assert not filter(lambda x: not isinstance(x, SortItem), sorting), \
+        assert not list(filter(lambda x: not isinstance(x, SortItem), sorting)), \
             'All sorting rules must be instances of SortItem'
 
         assert filters and sorting, 'Need to add filters and sorting!'
@@ -225,14 +223,14 @@ class ElvisClient(object):
         if isinstance(filters, FilterItem):
             filters = (filters, )
 
-        assert not filter(lambda x: not isinstance(x, FilterItem), filters), \
+        assert not list(filter(lambda x: not isinstance(x, FilterItem), filters)), \
             'All filters must be instances of FilterItem'
 
         assert isinstance(sorting, (list, tuple, SortItem)), 'Sorting must be a list or tuple'
         if isinstance(sorting, SortItem):
             sorting = (sorting, )
 
-        assert not filter(lambda x: not isinstance(x, SortItem), sorting), \
+        assert not list(filter(lambda x: not isinstance(x, SortItem), sorting)), \
             'All sorting rules must be instances of SortItem'
 
         result = self.__request("SearchTransportOrders", "POST", {
@@ -397,14 +395,14 @@ class ElvisClient(object):
         if isinstance(filters, FilterItem):
             filters = (filters, )
 
-        assert not filter(lambda x: not isinstance(x, FilterItem), filters), \
+        assert not list(filter(lambda x: not isinstance(x, FilterItem), filters)), \
             'All filters must be instances of FilterItem'
 
         assert isinstance(sorting, (list, tuple, SortItem)), 'Sorting must be a list or tuple'
         if isinstance(sorting, SortItem):
             sorting = (sorting, )
 
-        assert not filter(lambda x: not isinstance(x, SortItem), sorting), \
+        assert not list(filter(lambda x: not isinstance(x, SortItem), sorting)), \
             'All sorting rules must be instances of SortItem'
 
         assert filters and sorting, 'Need to add filters and sorting!'

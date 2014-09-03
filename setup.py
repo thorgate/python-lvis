@@ -18,6 +18,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'requests',
+        'django',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

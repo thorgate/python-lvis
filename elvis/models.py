@@ -83,7 +83,7 @@ class TimberAssortment(ElvisModel):
             if isinstance(packs, Pack):
                 packs = [packs, ]
 
-            assert not filter(lambda x: not isinstance(x, Pack), packs)
+            assert not list(filter(lambda x: not isinstance(x, Pack), packs))
             self.Packs = packs
 
             self.ExtensionData = None
@@ -182,7 +182,7 @@ class Warehouse(ElvisModel):
             if isinstance(additional_properties, AdditionalProperty):
                 additional_properties = [additional_properties, ]
 
-            assert not filter(lambda x: not isinstance(x, AdditionalProperty), additional_properties)
+            assert not list(filter(lambda x: not isinstance(x, AdditionalProperty), additional_properties))
             self.AdditionalProperties = additional_properties
         else:
             if not isinstance(self.Address, Address):
@@ -213,7 +213,7 @@ class TimberWarehouse(Warehouse):
             if isinstance(timber_batches, TimberBatch):
                 timber_batches = [timber_batches, ]
 
-            assert not filter(lambda x: not isinstance(x, TimberBatch), timber_batches)
+            assert not list(filter(lambda x: not isinstance(x, TimberBatch), timber_batches))
             self.TimberBatches = timber_batches
 
             self.Type = kwargs.get('warehouse_type')  # WarehouseType
@@ -256,7 +256,7 @@ class Shipment(ElvisModel):
             if isinstance(timber_batches, TimberBatch):
                 timber_batches = [timber_batches, ]
 
-            assert not filter(lambda x: not isinstance(x, TimberBatch), timber_batches)
+            assert not list(filter(lambda x: not isinstance(x, TimberBatch), timber_batches))
             self.TimberBatches = timber_batches
 
             self.ExtensionData = None
@@ -350,7 +350,7 @@ class TimberReceiver(Party):
             if isinstance(additional_properties, AdditionalProperty):
                 additional_properties = [additional_properties, ]
 
-            assert not filter(lambda x: not isinstance(x, AdditionalProperty), additional_properties)
+            assert not list(filter(lambda x: not isinstance(x, AdditionalProperty), additional_properties))
             self.AdditionalProperties = additional_properties
         else:
             if not isinstance(self.Address, Address):
@@ -441,7 +441,7 @@ class Transporter(ElvisModel):
             if isinstance(additional_properties, AdditionalProperty):
                 additional_properties = [additional_properties, ]
 
-            assert not filter(lambda x: not isinstance(x, AdditionalProperty), additional_properties)
+            assert not list(filter(lambda x: not isinstance(x, AdditionalProperty), additional_properties))
             self.AdditionalProperties = additional_properties
         else:
             props = self.AdditionalProperties
@@ -506,7 +506,7 @@ class Waybill(ElvisModel):
                 if isinstance(fine_measurements, TimberAssortment):
                     fine_measurements = [fine_measurements, ]
 
-                assert not filter(lambda x: not isinstance(x, TimberAssortment), fine_measurements)
+                assert not list(filter(lambda x: not isinstance(x, TimberAssortment), fine_measurements))
                 self.FineMeasurements = fine_measurements
 
             # Load received assortments
@@ -515,7 +515,7 @@ class Waybill(ElvisModel):
                 if isinstance(received_assortments, TimberBatch):
                     received_assortments = [received_assortments, ]
 
-                assert not filter(lambda x: not isinstance(x, TimberBatch), received_assortments)
+                assert not list(filter(lambda x: not isinstance(x, TimberBatch), received_assortments))
                 self.ReceivedAssortments = received_assortments
 
             # Load status change logs
@@ -524,7 +524,7 @@ class Waybill(ElvisModel):
                 if isinstance(status_change_logs, WaybillStatusChangeLog):
                     status_change_logs = [status_change_logs, ]
 
-                assert not filter(lambda x: not isinstance(x, WaybillStatusChangeLog), status_change_logs)
+                assert not list(filter(lambda x: not isinstance(x, WaybillStatusChangeLog), status_change_logs))
                 self.StatusChangeLogs = status_change_logs
 
             # Load shipments
@@ -533,7 +533,7 @@ class Waybill(ElvisModel):
                 if isinstance(shipments, Shipment):
                     shipments = [shipments, ]
 
-                assert not filter(lambda x: not isinstance(x, Shipment), shipments)
+                assert not list(filter(lambda x: not isinstance(x, Shipment), shipments))
                 self.Shipments = shipments
         else:
             # Timber owner
@@ -654,7 +654,7 @@ class WaybillListPage(ElvisModel):
             if isinstance(items, WaybillListItem):
                 items = [items, ]
 
-            assert not filter(lambda x: not isinstance(x, WaybillListItem), items)
+            assert not list(filter(lambda x: not isinstance(x, WaybillListItem), items))
             self.Items = items
 
         else:
@@ -685,7 +685,7 @@ class TransportOrderListPage(ElvisModel):
             if isinstance(items, TransportOrderListItem):
                 items = [items, ]
 
-            assert not filter(lambda x: not isinstance(x, TransportOrderListItem), items)
+            assert not list(filter(lambda x: not isinstance(x, TransportOrderListItem), items))
             self.Items = items
 
         else:
@@ -739,7 +739,7 @@ class TransportOrderTransporter(Transporter):
                 transports = [transports, ]
 
             assert transports
-            assert not filter(lambda x: not isinstance(x, Transport), transports)
+            assert not list(filter(lambda x: not isinstance(x, Transport), transports))
             self.Transports = transports
 
         else:
@@ -813,7 +813,7 @@ class TransportOrder(ElvisModel):
                 if isinstance(status_change_logs, TransportOrderStatusChangeLog):
                     status_change_logs = [status_change_logs, ]
 
-                assert not filter(lambda x: not isinstance(x, TransportOrderStatusChangeLog), status_change_logs)
+                assert not list(filter(lambda x: not isinstance(x, TransportOrderStatusChangeLog), status_change_logs))
                 self.StatusChangeLogs = status_change_logs
 
             # Load shipments
@@ -822,7 +822,7 @@ class TransportOrder(ElvisModel):
                 if isinstance(shipments, Shipment):
                     shipments = [shipments, ]
 
-                assert not filter(lambda x: not isinstance(x, Shipment), shipments)
+                assert not list(filter(lambda x: not isinstance(x, Shipment), shipments))
                 self.Shipments = shipments
         else:
             # Timber owner
