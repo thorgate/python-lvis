@@ -139,13 +139,14 @@ class ElvisClient(object):
         else:
             raise ElvisException("Server information not available, it was added in proxy version 1.1.*", raw=result)
 
-    def authorize(self):
+    def authorize(self, session_tag='default'):
         assert self.certificate, "Certificate must be provided"
 
         result = self.__request("Authorize", "POST", {
             'code': self.person_code,
             'certificateData': self.certificate,
-            'password': self.certificate_password
+            'password': self.certificate_password,
+            'connectionTag': session_tag,
         })
 
         if result["Success"] and result["raw"].get("AuthorizeResult", None) and result['raw']['AuthorizeResult'].get('Success'):
@@ -154,6 +155,16 @@ class ElvisClient(object):
             return True
         else:
             raise ElvisException("Authorization failed:", result)
+
+    def get_session_tag(self):
+        assert self.session_token, "No valid session available"
+
+        result = self.__request("getSessionTag", "GET", {})
+
+        if result["Success"]:
+            return result["raw"]['getSessionTagResult']
+        else:
+            raise ElvisException(result['message'], result['raw'])
 
     def get_assortment_types(self, assortment_type=AssortmentType.ELVIS):
         assert self.session_token, "No valid session available"

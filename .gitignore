@@ -54,5 +54,8 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-# Test Certificate
-test_cert.pfx
+# Test Certificates
+certs/*
+
+# Local Test config
+lvis_test_config/local.py

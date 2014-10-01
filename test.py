@@ -9,13 +9,16 @@ from elvis.models import (TimberAssortment, Certificate, TimberBatch, TimberWare
                           Warehouse, AdditionalProperty, TimberOwner, AuthorizedPerson, TimberReceiverDestination, TimberReceiver,
                           WaybillTransporter, Transport, Person, Vehicle, Waybill)
 
+import lvis_test_config
+
 
 class ElvisProxyTest(object):
 
     def __init__(self):
-        self.file_path = "test_cert.pfx"
+        self.file_path = lvis_test_config.TEST_CERTIFICATE_PATH
 
-        self.client = ElvisClient("http://54.194.211.213:9500/%s", "00000000000", certificate_pass='test')
+        self.client = ElvisClient(lvis_test_config.PROXY_HOST_URL, lvis_test_config.TEST_CERTIFICATE_PERSON_CODE,
+                                  certificate_pass=lvis_test_config.TEST_CERTIFICATE_PASSWORD)
         self.client.load_cert_from_file(self.file_path)
 
         self.warehouse_id = None
@@ -26,6 +29,31 @@ class ElvisProxyTest(object):
         print("Ühenduse loomine ...")
         assert self.client.authorize()
         print("Ühenduse loomine õnnestus")
+
+    def test_get_session_tag(self):
+        print("Ühenduse sildi kontrollimine")
+
+        original_token = self.client.session_token
+
+        tag = self.client.get_session_tag()
+        print('    Vaikimisi silt: %s - %s' % (tag, original_token))
+        assert tag == 'default'
+        print('    Vaikimisi silt on korrektne')
+
+        print("    Valikulise sildi testimine: 'testing'")
+        assert self.client.authorize('testing')
+
+        tag = self.client.get_session_tag()
+        new_token = self.client.session_token
+
+        print('    Valikuline silt: %s - %s' % (tag, new_token))
+        assert tag == 'testing'
+        print('    Valikuline silt on korrektne')
+
+        assert new_token != original_token
+        print('    %s != %s: Success' % (original_token, new_token))
+
+        print("Ühenduse sildi kontrollimine õnnestus")
 
     def test_assortment_types(self):
         print("Sortimendi tüüpide pärimine (elvise omad) ...")
@@ -376,20 +404,34 @@ if __name__ == '__main__':
 
     # Start tests
     test.test_authorize()
+    test.test_get_session_tag()
 
-    test.test_assortment_types()
-    test.test_assortment_types_company()
+    if lvis_test_config.TESTING_RANGE:
+        all_tests = lvis_test_config.TESTING_RANGE is True
+        if not all_tests:
+            if not isinstance(lvis_test_config.TESTING_RANGE, (list, tuple)):
+                raise ValueError('TESTING RANGE MUST BE True or a list/tuple typed value')
 
-    test.test_add_warehouse()
-    test.test_get_warehouse()
-    test.test_search_warehouse()
-    test.test_delete_warehouse()
+        if all_tests or lvis_test_config.TEST_LEVEL_ASSORTMENTS in lvis_test_config.TESTING_RANGE:
+            print('Testing assortments')
+            test.test_assortment_types()
+            test.test_assortment_types_company()
 
-    test.test_insert_waybill()
-    test.test_get_waybill()
-    test.test_set_waybill_status()
-    test.test_get_waybill_status()
+        if all_tests or lvis_test_config.TEST_LEVEL_WAREHOUSE in lvis_test_config.TESTING_RANGE:
+            print('Testing warehouses')
+            test.test_add_warehouse()
+            test.test_get_warehouse()
+            test.test_search_warehouse()
+            test.test_delete_warehouse()
 
-    test.test_search_waybills()
+        if all_tests or lvis_test_config.TEST_LEVEL_WAYBILL in lvis_test_config.TESTING_RANGE:
+            print('Testing waybills')
+
+            test.test_insert_waybill()
+            test.test_get_waybill()
+            test.test_set_waybill_status()
+            test.test_get_waybill_status()
+
+            test.test_search_waybills()
 
     print("Testi lõpp!")

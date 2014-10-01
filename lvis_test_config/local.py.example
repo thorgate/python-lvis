@@ -1,0 +1,7 @@
+PROXY_HOST_URL = "http://54.194.211.213:9500/%s"
+
+TEST_CERTIFICATE_PATH = "test_cert.pfx"
+TEST_CERTIFICATE_PERSON_CODE = "00000000000"
+TEST_CERTIFICATE_PASSWORD = "test"
+
+TESTING_RANGE = TEST_ALL  # Valid values are a list of test types (see base.py), TEST_ALL, or None for no extra tests.
