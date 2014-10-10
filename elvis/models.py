@@ -1,6 +1,8 @@
 import hashlib
 import json
 
+from django.utils.encoding import force_bytes
+
 from .enums import Priority, TransportOrderStatus
 
 
@@ -852,3 +854,22 @@ class TransportOrder(ElvisModel):
             if shipments:
                 for item in shipments:
                     self.Shipments.append(Shipment(dict_data=item))
+
+
+# noinspection PyPep8Naming
+class FineMeasurementFile(ElvisModel):
+
+    def __init__(self, **kwargs):
+        super(FineMeasurementFile, self).__init__(**kwargs)
+
+        if not self._already_loaded:
+            self.Description = kwargs.get('description')
+            self.ContentType = kwargs.get('content_type')
+            self.FileName = kwargs.get('file_name')
+
+            self.Data = force_bytes(kwargs.get('data'))
+
+            self.ExtensionData = None
+
+        else:
+            self.Data = force_bytes(self.Data)

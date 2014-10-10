@@ -1,13 +1,14 @@
 # coding=utf-8
 from datetime import datetime
 import uuid
+import json
 
-from elvis.api import ElvisClient
+from elvis.api import ElvisClient, ElvisException, ElvisEncoder
 from elvis.enums import (WarehouseType, WarehouseListItemSearchField, WarehouseListItemSortField, SortDirection, VehicleType, WaybillStatus,
                          WaybillRoleContext, WaybillListItemSearchField, WaybillListItemSortField, AssortmentType)
 from elvis.models import (TimberAssortment, Certificate, TimberBatch, TimberWarehouse, Address, FilterItem, SortItem, Pack, Shipment,
                           Warehouse, AdditionalProperty, TimberOwner, AuthorizedPerson, TimberReceiverDestination, TimberReceiver,
-                          WaybillTransporter, Transport, Person, Vehicle, Waybill)
+                          WaybillTransporter, Transport, Person, Vehicle, Waybill, FineMeasurementFile)
 
 import lvis_test_config
 
@@ -397,9 +398,95 @@ class ElvisProxyTest(object):
 
         print("Veoselehtede otsimine õnnestus! (%d tulemust)" % search_result.TotalCount)
 
+    def test_reception_assortments(self):
+        print("Vastuvõetud sortimendide lisamine ...", self.waybill.Shipments[0].TimberBatches[0].Id)
+
+        for assortment in self.waybill.Shipments[0].TimberBatches[0].Assortments:
+            reception_assortment_id = self.client.insert_reception_assortment(
+                self.waybill.Shipments[0].TimberBatches[0].Id,
+                assortment,
+            )
+            print("    Vastuvõetud sortimendi lisamine õnnestus (Id = %s)." % reception_assortment_id)
+
+            print("    Vastuvõetud sortimendi kustutamine (id = %s) ..." % reception_assortment_id)
+            if self.client.delete_reception_assortment(reception_assortment_id):
+                print("    Vastuvõetud sortimendi kustutamine õnnestus!")
+
+            else:
+                raise Exception("    Vastuvõetud sortimendi kustutamine ebaõnnestus!")
+
+            print("    Vastuvõetud sortimendi lisamine ...")
+            reception_assortment_id2 = self.client.insert_reception_assortment(
+                self.waybill.Shipments[0].TimberBatches[0].Id,
+                assortment,
+            )
+            assert reception_assortment_id != reception_assortment_id2
+            print("    Vastuvõetud sortimendi lisamine õnnestus (Id = %s)." % reception_assortment_id2)
+
+    def test_fine_measurement_assortments(self):
+        try:
+            print("Täppismõõdetud sortimendi lisamine ...", self.waybill.Number)
+            fine_measurement_id = self.client.insert_fine_measurement_assortment(
+                self.waybill.Number,
+                TimberAssortment(amount=12, description='Täppis andmed', assortment_type=3)
+            )
+            print("Täppismõõdetud sortimendi lisamine õnnestus (Id = %s)!" % fine_measurement_id)
+
+        except ElvisException:
+            status = self.client.get_waybill_status(self.waybill.Number)
+            self.waybill.Status = status.Status
+            self.waybill.Version = status.Version
+
+            print("Veoselehe (number = %s) staatuse muutmine %d -> %d ..." % (self.waybill.Number,
+                                                                               self.waybill.Status,
+                                                                               WaybillStatus.Received))
+
+            if self.client.set_waybill_status(self.waybill.Number, WaybillStatus.Received, "Vastuvõetud",
+                                              None, 200, None, self.waybill.Version):
+                print("Veosele staatuse muutmine õnnestus!")
+
+        else:
+            raise Exception('Täppismõõdetud sortimendi lisamine veoselehele mille staatus pole Received peaks ebaõnnestuma')
+
+        print("Täppismõõdetud sortimendi lisamine ...", self.waybill.Number)
+        fine_measurement_id = self.client.insert_fine_measurement_assortment(
+            self.waybill.Number,
+            TimberAssortment(amount=12, description='Täppis andmed', assortment_type=3)
+        )
+        print("Täppismõõdetud sortimendi lisamine õnnestus (Id = %s)!" % fine_measurement_id)
+
+        print("Täppismõõdetud sortimendi kustutamine (id = %s) ..." % fine_measurement_id)
+        if self.client.delete_fine_measurement_assortment(fine_measurement_id):
+            print("Täppismõõdetud sortimendi kustutamine õnnestus!")
+
+        else:
+            raise Exception("Täppismõõdetud sortimendi kustutamine ebaõnnestus!")
+
+        print("Täppismõõdetud sortimendi lisamine ...")
+        fine_measurement_id2 = self.client.insert_fine_measurement_assortment(
+            self.waybill.Number,
+            TimberAssortment(amount=321, description='Täppis andmed 2', assortment_type=3)
+        )
+        assert fine_measurement_id != fine_measurement_id2
+        print("Täppismõõdetud sortimendi lisamine õnnestus (Id = %s)!" % fine_measurement_id2)
+
+    def test_fine_measurement_files(self):
+        print("Täppismõõdetud faili lisamine ...")
+        fine_measurement_file_id = self.client.insert_fine_measurement_file(
+            self.waybill.Number,
+            FineMeasurementFile(content_type='text/plain', data='Test tekstifail', description='Testimiseks lisatud', file_name='Test.txt'),
+        )
+        print("Täppismõõdetud faili lisamine õnnestus (id = %s)" % fine_measurement_file_id)
+
+        print("Täppismõõdetud faili kustutamine (id = %s) ..." % fine_measurement_file_id)
+        if self.client.delete_fine_measurement_file(fine_measurement_file_id):
+            print("Täppismõõdetud faili kustutamine õnnestus!")
+
+        else:
+            raise Exception("Täppismõõdetud faili kustutamine ebaõnnestus!")
+
 
 if __name__ == '__main__':
-
     test = ElvisProxyTest()
 
     # Start tests
@@ -411,6 +498,11 @@ if __name__ == '__main__':
         if not all_tests:
             if not isinstance(lvis_test_config.TESTING_RANGE, (list, tuple)):
                 raise ValueError('TESTING RANGE MUST BE True or a list/tuple typed value')
+
+        if not all_tests and lvis_test_config.TEST_LEVEL_WAYBILL not in lvis_test_config.TESTING_RANGE:
+            if lvis_test_config.TEST_LEVEL_WAYBILL_ASSORTMENTS in lvis_test_config.TESTING_RANGE:
+                print('Adding waybill to testing range since its needed for other tests.')
+                lvis_test_config.TESTING_RANGE.append(lvis_test_config.TEST_LEVEL_WAYBILL)
 
         if all_tests or lvis_test_config.TEST_LEVEL_ASSORTMENTS in lvis_test_config.TESTING_RANGE:
             print('Testing assortments')
@@ -433,5 +525,10 @@ if __name__ == '__main__':
             test.test_get_waybill_status()
 
             test.test_search_waybills()
+
+            if all_tests or lvis_test_config.TEST_LEVEL_WAYBILL_ASSORTMENTS in lvis_test_config.TESTING_RANGE:
+                test.test_reception_assortments()
+                test.test_fine_measurement_assortments()
+                test.test_fine_measurement_files()
 
     print("Testi lõpp!")

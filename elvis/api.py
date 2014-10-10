@@ -1,5 +1,6 @@
 #coding:utf-8
 import base64
+from copy import copy
 import json
 import requests
 from datetime import datetime
@@ -9,7 +10,7 @@ from django.utils.encoding import force_text
 
 from .enums import (WarehouseType, AssortmentType, TransportOrderRoleContext, WaybillRoleContext)
 from .models import (FilterItem, SortItem, Address, ElvisModel, TransportOrderListPage, TransportOrder, TransportOrderStatusInfo,
-                     TimberWarehouse, Waybill, WaybillStatusInfo, WaybillListPage)
+                     TimberWarehouse, Waybill, WaybillStatusInfo, WaybillListPage, TimberAssortment, FineMeasurementFile)
 
 
 class ElvisException(Exception):
@@ -40,7 +41,10 @@ class ElvisEncoder(json.JSONEncoder):
         if not isinstance(obj, ElvisEncoder.ELVIS_OBJECTS):
             return super(ElvisEncoder, self).default(obj)
 
-        ret = obj.__dict__
+        ret = copy(obj.__dict__)
+
+        if isinstance(obj, FineMeasurementFile):
+            del ret['Data']
 
         if 'Id' in ret and ret['Id'] is None:
             del ret['Id']
@@ -429,5 +433,70 @@ class ElvisClient(object):
 
         if result.get("Success", False):
             return WaybillListPage(dict_data=result["raw"]["SearchWaybillsResult"])
+        else:
+            raise ElvisException(result['message'], result['raw'])
+
+    def insert_reception_assortment(self, timber_batch_id, timber_assortment):
+        assert self.session_token, "No valid session available"
+
+        assert isinstance(timber_assortment, TimberAssortment), 'Invalid TimberAssortment'
+
+        result = self.__request("InsertReceptionAssortment", "POST", {
+            'timber_batch_id': timber_batch_id,
+            'assortment': timber_assortment,
+        })
+
+        if result.get("Success", False):
+            return result["raw"]["InsertReceptionAssortmentResult"]
+        else:
+            raise ElvisException(result['message'], result['raw'])
+
+    def delete_reception_assortment(self, reception_assortment_id):
+        return self.__delete_function({'id': reception_assortment_id}, 'DeleteReceptionAssortment')
+
+    def insert_fine_measurement_assortment(self, waybill_number, timber_assortment):
+        assert self.session_token, "No valid session available"
+
+        assert isinstance(timber_assortment, TimberAssortment), 'Invalid TimberAssortment'
+
+        result = self.__request("InsertFineMeasurementAssortment", "POST", {
+            'waybill_number': waybill_number,
+            'assortment': timber_assortment,
+        })
+
+        if result.get("Success", False):
+            return result["raw"]["InsertFineMeasurementAssortmentResult"]
+        else:
+            raise ElvisException(result['message'], result['raw'])
+
+    def delete_fine_measurement_assortment(self, reception_assortment_id):
+        return self.__delete_function({'id': reception_assortment_id}, 'DeleteFineMeasurementAssortment')
+
+    def insert_fine_measurement_file(self, waybill_number, fine_measurement_file):
+        assert self.session_token, "No valid session available"
+
+        assert isinstance(fine_measurement_file, FineMeasurementFile), 'Invalid FineMeasurementFile'
+
+        result = self.__request("InsertFineMeasurementFile", "POST", {
+            'waybill_number': waybill_number,
+            'file': fine_measurement_file,
+            'file_data': force_text(base64.b64encode(fine_measurement_file.Data)),
+        })
+
+        if result.get("Success", False):
+            return result["raw"]["InsertFineMeasurementFileResult"]
+        else:
+            raise ElvisException(result['message'], result['raw'])
+
+    def delete_fine_measurement_file(self, fine_measurement_file_id):
+        return self.__delete_function({'id': fine_measurement_file_id}, 'DeleteFineMeasurementFile')
+
+    def __delete_function(self, params, endpoint):
+        assert self.session_token, "No valid session available"
+
+        result = self.__request(endpoint, "POST", params)
+
+        if result.get("Success", False):
+            return result["raw"]["%sResult" % endpoint]
         else:
             raise ElvisException(result['message'], result['raw'])
