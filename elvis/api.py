@@ -465,7 +465,13 @@ class ElvisClient(object):
         })
 
         if result.get("Success", False):
-            return result["raw"]["InsertFineMeasurementAssortmentResult"]
+            val = result["raw"]["InsertFineMeasurementAssortmentResult"]
+
+            if not val or val in ['0', 0]:
+                raise ElvisException('InsertFineMeasurementAssortmentResult:: returned id 0', result['raw'])
+
+            else:
+                return val
         else:
             raise ElvisException(result['message'], result['raw'])
 
