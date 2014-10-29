@@ -130,6 +130,7 @@ class TimberBatch(ElvisModel):
 
             self.HoldingBaseId = kwargs.get('holding_base_id')  # int
             self.Id = kwargs.get('batch_id', None)  # int or None
+            self.ForestNotice = kwargs.get('ForestNotice', None)  # string or None
 
             self.PreviousOwnerAddress = kwargs.get('prev_owner_address')  # string
             self.PreviousOwnerCode = kwargs.get('prev_owner_code')  # string
