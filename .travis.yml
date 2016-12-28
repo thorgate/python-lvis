@@ -1,0 +1,34 @@
+language: python
+python:
+- '3.4'
+install:
+- pip install -r requirements-test.txt
+script:
+- tox
+env:
+  matrix:
+  - TOXENV=py27-django16
+  - TOXENV=py27-django17
+  - TOXENV=py27-django18
+  - TOXENV=py33-django16
+  - TOXENV=py33-django17
+  - TOXENV=py33-django18
+  - TOXENV=py34-django16
+  - TOXENV=py34-django17
+  - TOXENV=py34-django18
+deploy:
+  provider: pypi
+  user: thorgate
+  password:
+    secure: >
+      LWOCnrLw1BrrWGrZdsZ6Zfo7scQCZhfmR23vujUCgi7PZE1fODI3HJ/L6fz7uuzD2SBgi8Ihqg4xxOkskhD+OIp6mKjUySPOlVxMqp/Z8jSOk
+      Z3tKKml9froW1OCAsDDPb09h5Z4BsBjY+5lGPUpvg2pbd9sDbRWr/i1HydV8kkwmynP7f/d3tpp8FDKLlPLJY5Afo/AqoG5BtUi26IgY0IrE8
+      5tVa9KSZx1aCq9sFMxP35bM6CMuIn1SXtw7K349iaIu3ly1+qPDbQWjaDW4Ba1TzE2SPsi2ldBwV2pxMY0lubIagvnlWpg6v+HM+IqC8fTw4f
+      aeK8du3JeckxjQXvjrCRymlEXBL/QNELIpGWP7wy/wxsoAZa5e+5xHMP4Ri7hANcfQsEGo+OKTisf+1Ft8w2RIKrNTxL0Rp1DCA2T7njWossH
+      pyKEpmfQdk0WIs3ykthtCwew8QpFm6v4VaW29Z9H+rx2S3OdF59hL90iuxlTRBV93TO2KdH5RIbgR65fvx8COc+BBJycvl/ck3cU5zaWA5dJp
+      UEu0phOld41Vejlu/ulKRmAI9EdrL5e+8Scbe2kXNXDM9C/7Uldo/ZBrq3JcV5EyYdoLZZAF0NRo93L0C8tSpJOZuVilNldDhzYgQ6ALeSez0
+      7Gp4RtN+2KKLCJPvIiMgbLN9T8+nM=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: thorgate/python-lvis
