@@ -1,0 +1,43 @@
+language: python
+python:
+- '3.4'
+install:
+- pip install -r requirements-test.txt
+script:
+- tox
+env:
+  matrix:
+  - TOXENV=py27-django16
+  - TOXENV=py27-django17
+  - TOXENV=py27-django18
+  - TOXENV=py33-django16
+  - TOXENV=py33-django17
+  - TOXENV=py33-django18
+  - TOXENV=py34-django16
+  - TOXENV=py34-django17
+  - TOXENV=py34-django18
+  global:
+  # PROXY_HOST_URL
+  - secure: epoVlAowo5qnpGpF/OpHp/Dtrw2F0gT5QKKNBuMlVw4+lDfH1OZf2iBDEneuqKt8GEftCaId2H8YU6dKLilnOFTj0LaXCJJNFdKlha6L0yU1WbVmNPBFmu7ug2XVHL2jQrVGGAn1JNtMzn1NxFBZCo43+Lxxnlw9YmsSZPfF4CLdaR9CawLIYtqjb0fHwO971j6qzosivgBxSOBL7K8ybg6M/TG9r+fiHxUPybGI1Cl6Nr/13Y+GGN0i8a1MRJo+xO4maPOejlhlMJvyUI4XofLsh7rqFTL5ve7JxKGkUZzoPKQJFLNIf11jD3MB5XrHBmu7AX/mTbLDgC9E5lRnSWGXcfi4RhrU+SeQfE3kzqGEGyf5YHvxV2GWVFSREDYm/1fy3M47kCwaopVcWO03LJGU8RinrU8yrmCHb85LWX+8EmTafqnXKnQ7xiyj4oSXIHdv6EtTUdg1144Oxph6X8wDmTCh+siNB3LKYpI88DkIl3gEo+heOoHffcG5oGcThWrpJ5WllpyPGbe1sI7cG2o+i7rpz5hAueJraBAS5HGVqUzEr6gh/UQhPIRjvXI2RLAT1JZ2L9VWVS6d7VXBJd2k0D9I4bezebnDETDQpo+fZsVZC2f5q33ZXAMquNVNVIjiXNEm1rZt2me+zEpKdoGydoQM26ZHIeub1m55DGo=
+  - TEST_CERTIFICATE_PATH=test_cert.pfx
+  - TEST_CERTIFICATE_PERSON_CODE=00000000000
+  - TEST_CERTIFICATE_PASSWORD=test
+deploy:
+  provider: pypi
+  user: thorgate
+  password:
+    secure: >
+      LWOCnrLw1BrrWGrZdsZ6Zfo7scQCZhfmR23vujUCgi7PZE1fODI3HJ/L6fz7uuzD2SBgi8Ihqg4xxOkskhD+OIp6mKjUySPOlVxMqp/Z8jSOk
+      Z3tKKml9froW1OCAsDDPb09h5Z4BsBjY+5lGPUpvg2pbd9sDbRWr/i1HydV8kkwmynP7f/d3tpp8FDKLlPLJY5Afo/AqoG5BtUi26IgY0IrE8
+      5tVa9KSZx1aCq9sFMxP35bM6CMuIn1SXtw7K349iaIu3ly1+qPDbQWjaDW4Ba1TzE2SPsi2ldBwV2pxMY0lubIagvnlWpg6v+HM+IqC8fTw4f
+      aeK8du3JeckxjQXvjrCRymlEXBL/QNELIpGWP7wy/wxsoAZa5e+5xHMP4Ri7hANcfQsEGo+OKTisf+1Ft8w2RIKrNTxL0Rp1DCA2T7njWossH
+      pyKEpmfQdk0WIs3ykthtCwew8QpFm6v4VaW29Z9H+rx2S3OdF59hL90iuxlTRBV93TO2KdH5RIbgR65fvx8COc+BBJycvl/ck3cU5zaWA5dJp
+      UEu0phOld41Vejlu/ulKRmAI9EdrL5e+8Scbe2kXNXDM9C/7Uldo/ZBrq3JcV5EyYdoLZZAF0NRo93L0C8tSpJOZuVilNldDhzYgQ6ALeSez0
+      7Gp4RtN+2KKLCJPvIiMgbLN9T8+nM=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: thorgate/python-lvis
+before_install:
+- openssl aes-256-cbc -K $encrypted_dd19fa13e5b8_key -iv $encrypted_dd19fa13e5b8_iv
+  -in test_cert.pfx.enc -out test_cert.pfx -d
