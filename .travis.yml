@@ -1,10 +1,14 @@
 language: python
+
 python:
 - '3.4'
+
 install:
 - pip install -r requirements-test.txt
+
 script:
 - tox
+
 env:
   matrix:
   - TOXENV=py27-django16
@@ -22,6 +26,7 @@ env:
   - TEST_CERTIFICATE_PATH=test_cert.pfx
   - TEST_CERTIFICATE_PERSON_CODE=00000000000
   - TEST_CERTIFICATE_PASSWORD=test
+
 deploy:
   provider: pypi
   user: thorgate
@@ -38,6 +43,10 @@ deploy:
     tags: true
     distributions: sdist bdist_wheel
     repo: thorgate/python-lvis
+
 before_install:
 - openssl aes-256-cbc -K $encrypted_dd19fa13e5b8_key -iv $encrypted_dd19fa13e5b8_iv
   -in test_cert.pfx.enc -out test_cert.pfx -d
+
+notifications:
+    email: false
