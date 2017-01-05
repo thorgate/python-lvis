@@ -358,13 +358,13 @@ class ElvisProxyTest(object):
 
         self.waybill_id = self.client.insert_waybill(waybill)
 
-        print("Veoselehe sisestamine õnnestus %s!" % self.waybill_id)
+        print("Veoselehe sisestamine õnnestus %s!" % str(self.waybill_id))
 
     def test_get_waybill(self):
         print("Veoselehe lugemine (number = %s) ..." % self.waybill_id)
 
         self.waybill = self.client.get_waybill(self.waybill_id)
-        print("Veoselehe lugemine õnnestus %s!" % self.waybill.Number)
+        print("Veoselehe lugemine õnnestus %s!" % str(self.waybill.Number))
 
     def test_set_waybill_status(self):
         print("Veoselehe (number = %s) staatuse muutmine %d -> %d ..." % (self.waybill.Number,
@@ -376,7 +376,7 @@ class ElvisProxyTest(object):
             print("Veosele staatuse muutmine õnnestus!")
 
     def test_get_waybill_status(self):
-        print("Veoselehe (number = %s) staatuse pärimine..." % self.waybill.Number)
+        print("Veoselehe (number = %s) staatuse pärimine..." % str(self.waybill.Number))
         status = self.client.get_waybill_status(self.waybill.Number)
         print("Veoselehe staatuse päring õnnestus, staatus on %s." % status.Status)
 
