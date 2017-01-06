@@ -32,13 +32,13 @@ deploy:
   user: thorgate
   password:
     secure: >
-      LWOCnrLw1BrrWGrZdsZ6Zfo7scQCZhfmR23vujUCgi7PZE1fODI3HJ/L6fz7uuzD2SBgi8Ihqg4xxOkskhD+OIp6mKjUySPOlVxMqp/Z8jSOk
-      Z3tKKml9froW1OCAsDDPb09h5Z4BsBjY+5lGPUpvg2pbd9sDbRWr/i1HydV8kkwmynP7f/d3tpp8FDKLlPLJY5Afo/AqoG5BtUi26IgY0IrE8
-      5tVa9KSZx1aCq9sFMxP35bM6CMuIn1SXtw7K349iaIu3ly1+qPDbQWjaDW4Ba1TzE2SPsi2ldBwV2pxMY0lubIagvnlWpg6v+HM+IqC8fTw4f
-      aeK8du3JeckxjQXvjrCRymlEXBL/QNELIpGWP7wy/wxsoAZa5e+5xHMP4Ri7hANcfQsEGo+OKTisf+1Ft8w2RIKrNTxL0Rp1DCA2T7njWossH
-      pyKEpmfQdk0WIs3ykthtCwew8QpFm6v4VaW29Z9H+rx2S3OdF59hL90iuxlTRBV93TO2KdH5RIbgR65fvx8COc+BBJycvl/ck3cU5zaWA5dJp
-      UEu0phOld41Vejlu/ulKRmAI9EdrL5e+8Scbe2kXNXDM9C/7Uldo/ZBrq3JcV5EyYdoLZZAF0NRo93L0C8tSpJOZuVilNldDhzYgQ6ALeSez0
-      7Gp4RtN+2KKLCJPvIiMgbLN9T8+nM=
+      XB//mP+/76Xhhr0QEbws7ygvdUMHbiaA3Et/XRGkYycUOKGHqvheiORpuS7Wzs1kdvvoilRjFdnJ0y4LFigWbr8vBtb1WIvf87Tp9W1xepnPo
+      qKtkVbTcTWcwrX4HA1kDXWhUG3yZIBT9zlQX2c3JBM40YfF+rDCAvdigaczjSqaZW7E5kUvoXu0XdrNT7ly1Qf4qEt2IYzgrAAeMEPkKWYgzY
+      kjr+a0iXiY4QwPcU2wzCxOPUuRDgU78GIQ9SRjHs3UHrrnAwXfQw/4ajahvM56kuAUa7IJtSkAGdidZ6rFQLmKCloEOhKRiAKNAg2IUCNhtVu
+      /HXSC+0DqirrHG+nxRFOK+u7BAxhcObGJ04CZe1icbZx1kpPlN6Vlxo/QT4iO1t/CRpZvF/UQBBJ4Q4w0MPEE3YEnRq0MhF3XtZe4slP0JIwV
+      7Rzi92835NpNJc6pn6sOAge4kZsaoNfBCdIKLulZrFjmRhOn7PMzgPqWC6ueAcO/ZW5Ib4FIgLlx+Z7/UweRjD4OaVtyaPlERtr2efYUmbfOR
+      Pyd7Sdq0HlOtM+fQ22W/wdSTA90ZcWjtATXMc84tHRWAyxCt8EhDRkbMU53SJ3UA427Riy5fC2KAv9OQiBDVMCD1AsMg9ZrlH0jeIjxUEXYFm
+      EwmeXbr3RPFIKx47c+21jTof+L120=
   on:
     tags: true
     distributions: sdist bdist_wheel
