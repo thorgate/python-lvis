@@ -27,22 +27,26 @@ env:
   - TEST_CERTIFICATE_PERSON_CODE=00000000000
   - TEST_CERTIFICATE_PASSWORD=test
 
-deploy:
-  provider: pypi
-  user: thorgate
-  password:
-    secure: >
-      KRZ4RNRXcpX3VCAnM4csLPHOTXF/RtpuwfaaCyz6//502mPKuT1i/RnpMcER6Mnyilv0uuNpCONxciwqzUG/m8sJ2R64lv2pwVoNUqcvWfynh
-      PaGfcTZKSqAKTcsi1Mv2UHACS5BJfaGqPYW2LWRRKZxxEeyq04gkJ/2hKPc3tvCXfSWOOFCThBJbxmd5l/KzGsawdEZptnVvck+fvPAHCkaAu
-      qpfCjuZCTZGt5bS5L0ibvOIr8fgDVsDTkG+uAm4iVQDTJZUWkrAIRj53Fzlt1vbYhFTXGb9noW0dtzBoAg5CvStCudpFdZWDVcMWy14BuRHmS
-      SSeAB3xnbEyrlFAyEic+HgiqGyiLXsvNlKSgzpOeppq+2p2YWLQaMbvcmFMDWwD8kdD5yubcE8Mjq9uoBtMxuc8kKsdArgoTbGvQU45sfyKCd
-      gIfG98sWsZpx7O1M8r0TNvSpJcHu5v0II9kBrapTg3ZSPpVA+aDA22YF4IX/Y1NNy2/AmwbxsIuJI6JYu3JVo8JPaHtICZQtPBML7ZKvcxwXa
-      MWxuTNfge4185I68psnnoO6JjVUjk5aY2VGETQ1p+pFA22jn7KTTX4+mO3t8nyLwWKJfkr6h4uf5DyxymqaUAZUj14yfnKWJ//9cqolb/LFzG
-      SmZfkBvtvj7snZNw9O7GrcF6Y9WI0=
-  on:
-    tags: true
-    distributions: sdist bdist_wheel
-    repo: thorgate/python-lvis
+jobs:
+  include:
+    - stage: deploy
+      env: TOXENV=py34-django18
+      deploy:
+        provider: pypi
+        user: thorgate
+        password:
+          secure: >
+            KRZ4RNRXcpX3VCAnM4csLPHOTXF/RtpuwfaaCyz6//502mPKuT1i/RnpMcER6Mnyilv0uuNpCONxciwqzUG/m8sJ2R64lv2pwVoNUqcvWfynh
+            PaGfcTZKSqAKTcsi1Mv2UHACS5BJfaGqPYW2LWRRKZxxEeyq04gkJ/2hKPc3tvCXfSWOOFCThBJbxmd5l/KzGsawdEZptnVvck+fvPAHCkaAu
+            qpfCjuZCTZGt5bS5L0ibvOIr8fgDVsDTkG+uAm4iVQDTJZUWkrAIRj53Fzlt1vbYhFTXGb9noW0dtzBoAg5CvStCudpFdZWDVcMWy14BuRHmS
+            SSeAB3xnbEyrlFAyEic+HgiqGyiLXsvNlKSgzpOeppq+2p2YWLQaMbvcmFMDWwD8kdD5yubcE8Mjq9uoBtMxuc8kKsdArgoTbGvQU45sfyKCd
+            gIfG98sWsZpx7O1M8r0TNvSpJcHu5v0II9kBrapTg3ZSPpVA+aDA22YF4IX/Y1NNy2/AmwbxsIuJI6JYu3JVo8JPaHtICZQtPBML7ZKvcxwXa
+            MWxuTNfge4185I68psnnoO6JjVUjk5aY2VGETQ1p+pFA22jn7KTTX4+mO3t8nyLwWKJfkr6h4uf5DyxymqaUAZUj14yfnKWJ//9cqolb/LFzG
+            SmZfkBvtvj7snZNw9O7GrcF6Y9WI0=
+        on:
+          tags: true
+          distributions: sdist bdist_wheel
+          repo: thorgate/python-lvis
 
 before_install:
 - openssl aes-256-cbc -K $encrypted_dd19fa13e5b8_key -iv $encrypted_dd19fa13e5b8_iv
