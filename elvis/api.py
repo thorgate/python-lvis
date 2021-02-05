@@ -1,4 +1,5 @@
-#coding:utf-8
+# coding:utf-8
+
 import base64
 from copy import copy
 import json
@@ -8,9 +9,11 @@ from decimal import Decimal
 
 from django.utils.encoding import force_text
 
-from .enums import (WarehouseType, AssortmentType, TransportOrderRoleContext, WaybillRoleContext)
-from .models import (FilterItem, SortItem, Address, ElvisModel, TransportOrderListPage, TransportOrder, TransportOrderStatusInfo,
-                     TimberWarehouse, Waybill, WaybillStatusInfo, WaybillListPage, TimberAssortment, FineMeasurementFile)
+from .enums import WarehouseType, AssortmentType, TransportOrderRoleContext, WaybillRoleContext
+from .models import (
+    FilterItem, SortItem, Address, ElvisModel, TransportOrderListPage, TransportOrder, TransportOrderStatusInfo,
+    TimberWarehouse, Waybill, WaybillStatusInfo, WaybillListPage, TimberAssortment, FineMeasurementFile,
+)
 
 
 class ElvisException(Exception):
@@ -56,13 +59,19 @@ class ElvisEncoder(json.JSONEncoder):
 
 
 class ElvisClient(object):
-    def __init__(self, api_url, person_code, certificate_pass="", session_token=None):
+    DEFAULT_REQUEST_TIMEOUT = 30  # 30 seconds
+
+    def __init__(
+        self, api_url, person_code, certificate_pass="",
+        session_token=None, request_timeout=DEFAULT_REQUEST_TIMEOUT,
+    ):
         self.api_url = api_url
 
         self.person_code = person_code
         self.certificate = None
         self.certificate_password = certificate_pass or ""
         self.session_token = session_token or None
+        self.request_timeout = request_timeout
 
         assert self.person_code, "Person code must be provided"
 
@@ -105,9 +114,10 @@ class ElvisClient(object):
             headers['Authorization'] = self.session_token
 
         if method.lower() == "post":
-            result = func(self.api_url % endpoint, data=json.dumps(attrs, cls=ElvisEncoder), headers=headers)
+            result = func(self.api_url % endpoint, data=json.dumps(attrs, cls=ElvisEncoder), headers=headers,
+                          timeout=self.request_timeout)
         else:
-            result = func(self.api_url % endpoint, params=attrs, headers=headers)
+            result = func(self.api_url % endpoint, params=attrs, headers=headers, timeout=self.request_timeout)
 
         if result.status_code == 200:
             text = result.text
