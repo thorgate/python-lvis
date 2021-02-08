@@ -59,7 +59,7 @@ class ElvisEncoder(json.JSONEncoder):
 
 
 class ElvisClient(object):
-    DEFAULT_REQUEST_TIMEOUT = 30  # 30 seconds
+    DEFAULT_REQUEST_TIMEOUT = 120  # 120 seconds
 
     def __init__(
         self, api_url, person_code, certificate_pass="",
