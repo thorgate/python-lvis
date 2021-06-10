@@ -22,7 +22,7 @@ class ElvisModel(object):
     def __init__(self, **kwargs):
         dict_data = kwargs.get('dict_data', None)
         if dict_data:
-            self.__dict__ = dict_data
+            self.__dict__ = dict_data.copy()
             self._already_loaded = True
         else:
             self._already_loaded = False
@@ -757,7 +757,9 @@ class TransportOrderTransporter(Transporter):
     def get_waybill_transporter(self, transport_hash):
         transport = None
         for t in self.Transports:
-            if transport_hash == hashlib.md5("%s%s%s" % (t.Driver.PersonCode, t.Trailer.RegistrationNumber, t.Van.RegistrationNumber)).hexdigest():
+            if transport_hash == hashlib.md5(
+                ("%s%s%s" % (t.Driver.PersonCode, t.Trailer.RegistrationNumber, t.Van.RegistrationNumber)).encode("utf-8")
+            ).hexdigest():
                 transport = t
                 break
         assert transport
