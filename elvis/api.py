@@ -14,6 +14,7 @@ from .models import (
     FilterItem, SortItem, Address, ElvisModel, TransportOrderListPage, TransportOrder, TransportOrderStatusInfo,
     TimberWarehouse, Waybill, WaybillStatusInfo, WaybillListPage, TimberAssortment, FineMeasurementFile,
 )
+from .utils import DATE_PREFIX, DATE_SUFFIX, ELVIS_TIMEZONE
 
 
 class ElvisException(Exception):
@@ -21,8 +22,41 @@ class ElvisException(Exception):
         self.message = message
         self.raw = raw
 
+    @classmethod
+    def reformat_elvis_exception_text(cls, value, indent=1):
+        new_value = value
+
+        if isinstance(value, dict):
+            new_value = "\n"
+            for key in value:
+                new_value = "%s%s`%s`:%s\n" % (
+                    new_value,
+                    "    " * indent,
+                    key,
+                    cls.reformat_elvis_exception_text(
+                        value[key], indent=indent+1
+                    ),
+                )
+
+        elif isinstance(value, list):
+            new_value = "\n"
+            for index, item in enumerate(value):
+                new_value = "%s%s[%s]:%s\n" % (
+                    new_value,
+                    "    " * indent,
+                    index,
+                    cls.reformat_elvis_exception_text(
+                        item, indent=indent+1
+                    ),
+                )
+
+        elif hasattr(value, "replace"):
+            new_value = value.replace(u"\\u000d\\u000a", "\n")
+
+        return new_value
+
     def __str__(self):
-        return "ElvisException %s: %s" % (self.message, self.raw)
+        return "ElvisException %s: %s" % (self.message, self.reformat_elvis_exception_text(self.raw))
 
 
 class ElvisEncoder(json.JSONEncoder):
@@ -39,7 +73,18 @@ class ElvisEncoder(json.JSONEncoder):
             return float(obj)
 
         if isinstance(obj, datetime):
-            return '/Date(%d)/' % ((obj - datetime(1970, 1, 1)).total_seconds() * 1000)
+            # Elvis timestamp offsets are from Tallinn time
+            timezone_offset = obj.utcoffset() - obj.astimezone(ELVIS_TIMEZONE).utcoffset()
+
+            timezone_offset_hours = timezone_offset.total_seconds() // 3600
+            timezone_offset_minutes = (timezone_offset.total_seconds() - timezone_offset_hours * 3600) // 60
+            return '%s%d+%02d%02d%s' % (
+                DATE_PREFIX,
+                (obj - datetime(1970, 1, 1)).total_seconds() * 1000,
+                timezone_offset_hours,
+                timezone_offset_minutes,
+                DATE_SUFFIX,
+            )
 
         if not isinstance(obj, ElvisEncoder.ELVIS_OBJECTS):
             return super(ElvisEncoder, self).default(obj)
@@ -119,27 +164,28 @@ class ElvisClient(object):
         else:
             result = func(self.api_url % endpoint, params=attrs, headers=headers, timeout=self.request_timeout)
 
+        error_message = ""
+        try:
+            json_data = json.loads(result.text)
+        except ValueError:
+            error_message = "not json"
+            json_data = result.text
+
         if result.status_code == 200:
-            text = result.text
-
-            try:
-                return {
-                    "Success": True,
-                    "raw": json.loads(text),
-                }
-            except ValueError:
-                return {
-                    "Success": False,
-                    "message": "not json",
-                    "raw": text,
-                }
-
+            success = True
         else:
-            return {
-                "Success": False,
-                "message": "Bad status code: %d" % result.status_code,
-                "raw": result.text,
-            }
+            error_message = "Bad status code: %d" % result.status_code,
+            success = False
+
+        result = {
+            "Success": success,
+            "raw": json_data,
+        }
+
+        if error_message:
+            result["message"] = error_message
+
+        return result
 
     # ENDPOINTS
 

@@ -1,17 +1,33 @@
+class ElvisEnum(object):
+    @classmethod
+    def display_name(cls, status):
+        for item in cls.__dict__:
+            if not item.startswith("_") and isinstance(cls.__dict__[item], int) and cls.__dict__[item] == int(status):
+                return item
+        return "Unknown"
+
+    @classmethod
+    def get_status_choices(cls):
+        choices = []
+        for item in cls.__dict__:
+            if not item.startswith("_") and isinstance(cls.__dict__[item], int):
+                choices.append((cls.__dict__[item], item))
+
+        return choices
 
 
-class AssortmentType(object):
+class AssortmentType(ElvisEnum):
     ELVIS = 0
     COMPANY = 1
 
 
-class Priority(object):
+class Priority(ElvisEnum):
     Low = 11001
     Normal = 11002
     High = 11003
 
 
-class WarehouseListItemSearchField(object):
+class WarehouseListItemSearchField(ElvisEnum):
     CompanyRegistrationNumber = 0
     UserId = 1
     Code = 2
@@ -37,7 +53,7 @@ class WarehouseListItemSearchField(object):
     AdditionalProperty = 22
 
 
-class TransportOrderListItemSearchField(object):
+class TransportOrderListItemSearchField(ElvisEnum):
     GroupId = 0
     OwnerCode = 1
     RecieverCode = 2
@@ -72,7 +88,7 @@ class TransportOrderListItemSearchField(object):
     ContactName = 31
 
 
-class TransportOrderListItemSortField(object):
+class TransportOrderListItemSortField(ElvisEnum):
     Deadline = 0
     CreatedOn = 1
     OwnerName = 2
@@ -81,7 +97,7 @@ class TransportOrderListItemSortField(object):
     Number = 5
 
 
-class WarehouseListItemSortField(object):
+class WarehouseListItemSortField(ElvisEnum):
     Code = 0
     Name = 1
     TypeId = 2
@@ -90,36 +106,36 @@ class WarehouseListItemSortField(object):
     CreatedOn = 5
 
 
-class SortDirection(object):
+class SortDirection(ElvisEnum):
     Asc = 0
     Desc = 1
 
 
-class TransportOrderRoleContext(object):
+class TransportOrderRoleContext(ElvisEnum):
     Owner = 0
     Reciever = 1
     Transporter = 2
 
 
-class WaybillRoleContext(object):
+class WaybillRoleContext(ElvisEnum):
     Owner = 1
     Reciever = 2
     Transporter = 4
     All = 8
 
 
-class WarehouseType(object):
+class WarehouseType(ElvisEnum):
     ForestEdge = 5001
     Middle = 5002
     End = 5003
 
 
-class VehicleType(object):
+class VehicleType(ElvisEnum):
     Van = 9001
     Trailer = 9002
 
 
-class WaybillStatus(object):
+class WaybillStatus(ElvisEnum):
     Composing = 7001
     Confirmed = 7002
     Unloaded = 7003
@@ -130,7 +146,7 @@ class WaybillStatus(object):
     Cancelled = 7008
 
 
-class WaybillListItemSearchField(object):
+class WaybillListItemSearchField(ElvisEnum):
     OwnerCode = 0
     RecieverCode = 1
     RecieverName = 2
@@ -171,7 +187,7 @@ class WaybillListItemSearchField(object):
     Inspected = 37
 
 
-class WaybillListItemSortField(object):
+class WaybillListItemSortField(ElvisEnum):
     CreatedOn = 0
     OwnerName = 1
     DestinationWarehouseName = 2
@@ -179,7 +195,7 @@ class WaybillListItemSortField(object):
     Number = 4
 
 
-class TransportOrderStatus(object):
+class TransportOrderStatus(ElvisEnum):
     Composing = 4001
     Submitted = 4002
     Accepted = 4003
