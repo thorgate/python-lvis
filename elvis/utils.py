@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
 
 DATE_PREFIX = '/Date('
 DATE_SUFFIX = ')/'
 
 ELVIS_TIMEZONE = pytz.timezone('Europe/Tallinn')
+UTC = pytz.timezone('UTC')
 
 
 def decode_elvis_timestamp(timestamp: str):
@@ -24,8 +25,8 @@ def decode_elvis_timestamp(timestamp: str):
             return timestamp
 
         # Elvis Timezone offsets are relevant to Elvis natural timezone (Tallinn)
-        return datetime.fromtimestamp(seconds).astimezone(
-            ELVIS_TIMEZONE
-        ) + timedelta(minutes=timezone_offset)
+        return ELVIS_TIMEZONE.localize(datetime.fromtimestamp(seconds).astimezone(
+            pytz.FixedOffset(-timezone_offset)
+        ).replace(tzinfo=None))
 
     return timestamp
