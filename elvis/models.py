@@ -4,6 +4,7 @@ import json
 from django.utils.encoding import force_bytes
 
 from .enums import Priority, TransportOrderStatus
+from .utils import decode_elvis_timestamp
 
 
 class FilterItem(object):
@@ -19,13 +20,24 @@ class SortItem(object):
 
 
 class ElvisModel(object):
+    _DATETIME_ATTRIBUTES = []
+
     def __init__(self, **kwargs):
         dict_data = kwargs.get('dict_data', None)
         if dict_data:
-            self.__dict__ = dict_data
+            self.__dict__ = dict_data.copy()
             self._already_loaded = True
         else:
             self._already_loaded = False
+
+    def __getattribute__(self, name):
+        if name.startswith("_"):
+            return super().__getattribute__(name)
+
+        if name not in self._DATETIME_ATTRIBUTES:
+            return super().__getattribute__(name)
+
+        return decode_elvis_timestamp(super().__getattribute__(name))
 
 
 # noinspection PyPep8Naming
@@ -114,6 +126,8 @@ class Certificate(ElvisModel):
 
 # noinspection PyPep8Naming
 class TimberBatch(ElvisModel):
+    _DATETIME_ATTRIBUTES = ["DocDate"]
+
     def __init__(self, **kwargs):
         super(TimberBatch, self).__init__(**kwargs)
 
@@ -233,13 +247,15 @@ class TimberWarehouse(Warehouse):
 
 # noinspection PyPep8Naming
 class WaybillStatusChangeLog(ElvisModel):
+    _DATETIME_ATTRIBUTES = ["ChangedOn"]
+
     def __init__(self, **kwargs):
 
         super(WaybillStatusChangeLog, self).__init__(**kwargs)
 
         if not self._already_loaded:
             self.ChangedBy = kwargs.get('changed_by')
-            self.ChangedOn = kwargs.get('changed_on')
+            self._ChangedOn = kwargs.get('changed_on')
             self.Status = kwargs.get('status')
 
             self.ExtensionData = None
@@ -757,7 +773,9 @@ class TransportOrderTransporter(Transporter):
     def get_waybill_transporter(self, transport_hash):
         transport = None
         for t in self.Transports:
-            if transport_hash == hashlib.md5("%s%s%s" % (t.Driver.PersonCode, t.Trailer.RegistrationNumber, t.Van.RegistrationNumber)).hexdigest():
+            if transport_hash == hashlib.md5(
+                ("%s%s%s" % (t.Driver.PersonCode, t.Trailer.RegistrationNumber, t.Van.RegistrationNumber)).encode("utf-8")
+            ).hexdigest():
                 transport = t
                 break
         assert transport
@@ -773,6 +791,8 @@ class TransportOrderTransporter(Transporter):
 
 # noinspection PyPep8Naming
 class TransportOrder(ElvisModel):
+    _DATETIME_ATTRIBUTES = ["Deadline"]
+
     def __init__(self, **kwargs):
         super(TransportOrder, self).__init__(**kwargs)
 
